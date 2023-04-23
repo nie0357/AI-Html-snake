@@ -77,4 +77,22 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight' && direction !== 'left') direction = 'right';
 });
 
+document.addEventListener('touchstart', (event) => {
+  const touchX = event.touches[0].clientX;
+  const touchY = event.touches[0].clientY;
+  const canvasRect = canvas.getBoundingClientRect();
+  const canvasX = touchX - canvasRect.left;
+  const canvasY = touchY - canvasRect.top;
+  const halfCanvasWidth = canvas.width / 2;
+  const halfCanvasHeight = canvas.height / 2;
+
+  if (Math.abs(canvasX - halfCanvasWidth) > Math.abs(canvasY - halfCanvasHeight)) {
+    if (canvasX < halfCanvasWidth && direction !== 'right') direction = 'left';
+    if (canvasX > halfCanvasWidth && direction !== 'left') direction = 'right';
+  } else {
+    if (canvasY < halfCanvasHeight && direction !== 'down') direction = 'up';
+    if (canvasY > halfCanvasHeight && direction !== 'up') direction = 'down';
+  }
+});
+
 gameLoop();
