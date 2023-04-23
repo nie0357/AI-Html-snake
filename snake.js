@@ -94,5 +94,35 @@ document.addEventListener('touchstart', (event) => {
     if (canvasY > halfCanvasHeight && direction !== 'up') direction = 'down';
   }
 });
+var touchStartX = 0;
+var touchStartY = 0;
+var touchEndX = 0;
+var touchEndY = 0;
 
+document.addEventListener('touchstart', function(event) {
+  touchStartX = event.touches[0].clientX;
+  touchStartY = event.touches[0].clientY;
+});
+
+document.addEventListener('touchend', function(event) {
+  touchEndX = event.changedTouches[0].clientX;
+  touchEndY = event.changedTouches[0].clientY;
+
+  var deltaX = touchEndX - touchStartX;
+  var deltaY = touchEndY - touchStartY;
+
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    if (deltaX > 0) {
+      direction = 'right';
+    } else {
+      direction = 'left';
+    }
+  } else {
+    if (deltaY > 0) {
+      direction = 'down';
+    } else {
+      direction = 'up';
+    }
+  }
+});
 gameLoop();
