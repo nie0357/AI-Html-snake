@@ -1,20 +1,111 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ã∞≥‘…ﬂ”Œœ∑</title>
-  <style>
-    canvas {
-      display: block;
-      margin: 0 auto;
-      background-color: #f0f0f0;
-      border: 1px solid #ccc;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ë¥™ÂêÉËõá</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+            touch-action: none;
+        }
+    </style>
 </head>
 <body>
-  <canvas id="gameCanvas" width="320" height="320"></canvas>
-  <script src="snake.js"></script>
+    <canvas id="game" width="300" height="300"></canvas>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 15;
+        let snake = [{x: 7, y: 7}];
+        let apple = {x: 3, y: 3};
+        let direction = {x: 0, y: 0};
+        let lastTouch = null;
+
+        function update() {
+            const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
+            snake.unshift(head);
+
+            if (head.x === apple.x && head.y === apple.y) {
+                placeApple();
+            } else {
+                snake.pop();
+            }
+
+            if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+                resetGame();
+            }
+
+            for (let i = 1; i < snake.length; i++) {
+                if (snake[i].x === head.x && snake[i].y === head.y) {
+                    resetGame();
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'red';
+            ctx.fillRect(apple.x * 20, apple.y * 20, 20, 20);
+
+            ctx.fillStyle = 'green';
+            for (const segment of snake) {
+                ctx.fillRect(segment.x * 20, segment.y * 20, 20, 20);
+            }
+        }
+
+        function placeApple() {
+            apple = {
+                x: Math.floor(Math.random() * gridSize),
+                y: Math.floor(Math.random() * gridSize),
+            };
+
+            for (const segment of snake) {
+                if (segment.x === apple.x && segment.y === apple.y) {
+                    placeApple();
+                    break;
+                }
+            }
+        }
+
+        function resetGame() {
+            snake = [{x: 7, y: 7}];
+            direction = {x: 0, y: 0};
+            placeApple();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            setTimeout(gameLoop, 100);
+        }
+
+        gameLoop();
+
+        canvas.addEventListener('touchstart', (e) => {
+            lastTouch = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (lastTouch) {
+                const deltaX = e.touches[0].clientX - lastTouch.x;
+                const deltaY = e.touches[0].clientY - lastTouch.y;
+
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    direction = deltaX > 0 ? {x: 1, y: 0} : {x: -1, y: 0};
+                } else {
+                    direction = deltaY > 0 ? {x: 0, y: 1} : {x: 0, y: -1};
+                }
+            }
+        });
+
+        canvas.addEventListener('touchend', () => {
+            lastTouch = null;
+        });
+    </script>
 </body>
 </html>
